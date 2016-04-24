@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -15,8 +14,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import com.google.gson.Gson;
+
  //https://github.com/jpardogo/PagerSlidingTabStrip
 @Path("/grupo")
 public class GrupoServices {
@@ -33,8 +32,6 @@ public class GrupoServices {
 			psta = conn.prepareStatement("select Grupo.codGrupo,nmGrupo, Participante.codParticipante, Participante.nmParticipante, Grupo.codLider, Grupo.finalizado from Grupo  inner join ParticipanteGrupo  on Grupo.codGrupo=ParticipanteGrupo.codGrupo inner join Participante on ParticipanteGrupo.codParticipante = Participante.codParticipante where codEvento = ?");
 			psta.setInt(1, eID);
 			
-			
-			//
 			ResultSet rs = psta.executeQuery();
 			
 			while (rs.next()) {
