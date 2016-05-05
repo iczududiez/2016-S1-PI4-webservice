@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,37 +14,36 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import br.com.controller.GameStateManage;
-import br.com.objetos.Evento;
+import br.com.objetos.Alternativa;
 import br.com.senac.pi4.services.Database;
 
-@Path("/evento")
-public class EventoServices {
+@Path("/alternativa")
+public class AlternativaService {
 	
 	@Context ServletContext contexto;
 	private GameStateManage gsm = GameStateManage.getGameStateManage(contexto);
 	
-	public Evento selectEvento(String idEvento) throws Exception{
+	public List<Alternativa> selecionaAlternativas(int codQuestao) throws Exception{
 		
+		List<Alternativa> lstAlternativa = new ArrayList<Alternativa>();
 		Connection conn = null;
-		PreparedStatement psta = null;
-		Evento evento = null;
+		PreparedStatement psta = null;			
 		try {
 			conn = Database.get().conn();		
-			psta = conn.prepareStatement("select * from Evento where identificador = ?");
-			psta.setString(1, idEvento);
+			psta = conn.prepareStatement("select * from Alternativa where codQuestao = ?");
+			psta.setInt(1, codQuestao);
 			
 			ResultSet rs = psta.executeQuery();
 			
-			evento = new Evento();
-			evento.setCodEvento(rs.getInt("codEvento"));
-			evento.setDescricao(rs.getString("Descricao"));
-			evento.setData(rs.getString("data"));
-			evento.setCodTipoEvento(rs.getInt("codTipoEvento"));
-			evento.setCodStatus(rs.getString("codStatus"));
-			evento.setCodProfessor(rs.getInt("codProfessor"));
-			evento.setIdentificador(rs.getString("identificador"));
+			while (rs.next()) {
+				Alternativa alternativa = new Alternativa();
+				alternativa.setCodAlternativa(rs.getInt("codAlternativa"));
+				alternativa.setCodQuestao(rs.getInt("codQuestao"));
+				alternativa.setTextoAlternativa(rs.getString("textoAlternativa"));
+				alternativa.setCorreta(rs.getBoolean("correta"));
+				lstAlternativa.add(alternativa);
+			}
 		} catch (SQLException e) {
 			throw e;
 		} catch (Exception e) {
@@ -54,30 +54,26 @@ public class EventoServices {
 			if (conn != null)
 				conn.close ();
 		}
-		return evento;
+		return lstAlternativa;
 	}
 	
-
 	@GET
-	@Path("/{idEvento}")
+	@Path("/{codQuestao}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getEvento(@PathParam("idEvento") String idEvento) {
-
-		Evento evento = null;
+	public Response getAlaternativa(@PathParam("codQuestao") int codQuestao){
+		
+		List<Alternativa> listPg = null;
 		
 		try {
-			evento = selectEvento(idEvento);
+			listPg = selecionaAlternativas(codQuestao);
 		} catch (Exception e) {
 			return Response.status(500).entity(null).build();	
 		}
-		if (evento == null){
+		if (listPg == null)
 			return Response.status(404).entity(null).build();
-		}else if(evento.getCodStatus() == "F"){
-			return Response.status(401).entity(null).build();
-		}
 		
-		gsm.getGameState(idEvento);
 		
-		return Response.status(200).entity(evento).build();
+		return Response.status(200).entity(listPg).build();
 	}
+	
 }

@@ -5,55 +5,62 @@ public class Evento {
 	private int codEvento;
 	private String descricao;
 	private String data;
+	/*
+	 * 1 = Questão assincrona
+	 * 2 = Quem responder primeiro
+	 * 3 = Todos Respondem
+	 * 4 = Baseado no Master
+	 */
 	private int codTipoEvento;
-	private int codStatus;
-	private int codGestor;
-	
+	/*
+	 * C = Criado
+	 * A = Aberto
+	 * E = Em execução
+	 * F = Fechado
+	 */
+	private String codStatus;
+	private int codProfessor;
+	private String identificador;
 	public int getCodEvento() {
 		return codEvento;
 	}
-	
 	public void setCodEvento(int codEvento) {
-		codEvento = codEvento;
+		this.codEvento = codEvento;
 	}
-	
 	public String getDescricao() {
 		return descricao;
 	}
-	
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	
 	public String getData() {
 		return data;
 	}
-	
 	public void setData(String data) {
 		this.data = data;
 	}
-	
 	public int getCodTipoEvento() {
 		return codTipoEvento;
 	}
-	
 	public void setCodTipoEvento(int codTipoEvento) {
-		codTipoEvento = codTipoEvento;
+		this.codTipoEvento = codTipoEvento;
 	}
-	
-	public int getCodStatus() {
+	public String getCodStatus() {
 		return codStatus;
 	}
-	
-	public void setCodStatus(int codStatus) {
-		codStatus = codStatus;
+	public void setCodStatus(String codStatus) {
+		this.codStatus = codStatus;
 	}
-	
-	public int getCodGestor() {
-		return codGestor;
+	public int getCodProfessor() {
+		return codProfessor;
 	}
-	
-	public void setCodGestor(int codGestor) {
-		codGestor = codGestor;
+	public void setCodProfessor(int codProfessor) {
+		this.codProfessor = codProfessor;
+	}
+	public String getIdentificador() {
+		return identificador;
+	}
+	public void setIdentificador(String identificador) {
+		this.identificador = identificador;
 	}
 }

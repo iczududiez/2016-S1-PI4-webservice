@@ -7,8 +7,7 @@ public class Participante {
 	private int codCurso;
 	private String email;
 	private String senha;
-	private String sexo;
-	private String status;
+	private boolean ativo;
 	
 	public int getCodParticipante() {
 		return codParticipante;
@@ -40,16 +39,10 @@ public class Participante {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
-	public String getSexo() {
-		return sexo;
+	public boolean getAtivo() {
+		return ativo;
 	}
-	public void setSexo(String sexo) {
-		this.sexo = sexo;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 }

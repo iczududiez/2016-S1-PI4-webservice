@@ -32,7 +32,6 @@ public class ParticipanteServices {
 			psta.setString(1, login);
 			psta.setString(2, senha);
 			
-			
 			ResultSet rs = psta.executeQuery();
 			
 			participante = new Participante();
@@ -41,8 +40,7 @@ public class ParticipanteServices {
 			participante.setCodParticipante(rs.getInt("codCurso"));
 			participante.setEmail(rs.getString("email"));
 			participante.setSenha(rs.getString("senha"));
-			participante.setSexo(rs.getString("sexo"));
-			participante.setStatus(rs.getString("status"));
+			participante.setAtivo(rs.getBoolean("ativo"));
 		} catch (SQLException e) {
 			throw e;
 		} catch (Exception e) {
@@ -68,8 +66,9 @@ public class ParticipanteServices {
 		} catch (Exception e) {
 			return Response.status(500).entity(null).build();	
 		}
-		if (participante == null)
+		if (participante == null){
 			return Response.status(404).entity(null).build();
+		}
 		
 		
 		return Response.status(200).entity(participante).build();
