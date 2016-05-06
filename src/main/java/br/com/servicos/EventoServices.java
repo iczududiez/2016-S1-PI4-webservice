@@ -57,6 +57,32 @@ public class EventoServices {
 		return evento;
 	}
 	
+	public String statusEvento(String identificador) throws Exception{
+		Connection conn = null;
+		PreparedStatement psta = null;
+		String codEvento = null;
+		try {
+			conn = Database.get().conn();		
+			psta = conn.prepareStatement("select codStatus from Evento where identificador = ?");
+			psta.setString(1, identificador);
+			
+			ResultSet rs = psta.executeQuery();
+			rs.next();
+			codEvento = rs.getString("codStatus");
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (psta != null)
+				psta.close();
+			if (conn != null)
+				conn.close ();
+		}
+		
+		return codEvento;
+	}
+	
 
 	@GET
 	@Path("/{idEvento}")
@@ -79,5 +105,23 @@ public class EventoServices {
 		gsm.getGameState(idEvento);
 		
 		return Response.status(200).entity(evento).build();
+	}
+	
+	@GET
+	@Path("/codStatus/{identificador}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCodStatus(@PathParam("identificador") String identificador){
+
+		String codEvento = null;
+		try {
+			codEvento = statusEvento(identificador);
+		} catch (Exception e) {
+			return Response.status(500).entity(null).build();	
+		}
+		if (codEvento == null){
+			return Response.status(404).entity(null).build();
+		}
+		
+		return Response.status(200).entity(codEvento).build();
 	}
 }

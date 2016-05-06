@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 public class GrupoServices {
  
 	public List<ParticipanteGrupo> selectUsuario (String eventoId) throws Exception {
-		//exemplo de select
+		//exemplo de select 	
 		Connection conn = null;
 		PreparedStatement psta = null;
 		List<ParticipanteGrupo> listPg = new ArrayList<ParticipanteGrupo>();
