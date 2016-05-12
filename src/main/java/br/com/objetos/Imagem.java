@@ -1,12 +1,12 @@
 package br.com.objetos;
 
-import java.util.BitSet;
+import java.nio.charset.StandardCharsets;
 
 public class Imagem {
 	
 	private int codImagem;
 	private String tituloImagem;
-	private byte[] bitmapImagem;
+	private String bitmapImagem;
 	
 	public int getCodImagem() {
 		return codImagem;
@@ -20,11 +20,11 @@ public class Imagem {
 	public void setTituloImagem(String tituloImagem) {
 		this.tituloImagem = tituloImagem;
 	}
-	public byte[] getBitmapImagem() {
+	public String getBitmapImagem() {
 		return bitmapImagem;
 	}
 	public void setBitmapImagem(byte[] bitmapImagem) {
-		this.bitmapImagem = bitmapImagem;
+		this.bitmapImagem = new String(bitmapImagem, StandardCharsets.UTF_8);;
 	}
 	
 }

@@ -20,5 +20,4 @@ public class Database {
 		Connection conn = DriverManager.getConnection("jdbc:sqlserver://koo2dzw5dy.database.windows.net;user=TSI@koo2dzw5dy.database.windows.net;password=SistemasInternet123;database=SenaQuiz");
 		return conn;
 	}
-	
 }

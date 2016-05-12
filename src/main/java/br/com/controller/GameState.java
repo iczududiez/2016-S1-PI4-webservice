@@ -2,6 +2,8 @@ package br.com.controller;
 
 import java.sql.Timestamp;
 
+import br.com.objetos.Questao;
+
 public class GameState {
 	
 	public GameState(String idEvento,Timestamp timeState){
@@ -11,7 +13,7 @@ public class GameState {
 
 	private Timestamp timeState;
 	private String idEvento;
-	private int codCategoria;
+	private Questao questaoAtual;
 	
 	public String getIdEvento() {
 		return idEvento;
@@ -28,5 +30,12 @@ public class GameState {
 	public void setTimeState(Timestamp timeState) {
 		this.timeState = timeState;
 	}
-
+	
+	public Questao getQuestao(){
+		return this.questaoAtual;
+	}
+	
+	public void setQuestao(Questao questao){
+		this.questaoAtual = questao;
+	}
 }

@@ -1,4 +1,4 @@
-package br.com.servicos;
+package br.com.senac.pi4.services;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

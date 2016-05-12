@@ -4,35 +4,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
-
-import br.com.controller.GameStateManage;
-import br.com.objetos.Assunto;
+import br.com.objetos.Imagem;
 import br.com.senac.pi4.services.Database;
 
-public class AssuntoService {
+public class ImagemService {
 	
-	@Context ServletContext contexto;
-	private GameStateManage gsm = GameStateManage.getGameStateManage(contexto);
-	
-	public static Assunto selecionaAssunto(int codAssunto) throws Exception{
-		
+	public static Imagem selecionaImagem(int codImagem) throws Exception{
 		Connection conn = null;
 		PreparedStatement psta = null;
-		Assunto assunto = null;
+		Imagem imagem = null;
 		try {
 			conn = Database.get().conn();		
 			psta = conn.prepareStatement("select Assunto.codAssunto, Assunto.descricao, Area.descricao as descricaoArea from  Assunto inner join Area on Assunto.codArea = Area.codArea where codAssunto = ?");
-			psta.setInt(1, codAssunto);
+			psta.setInt(1, codImagem);
 			
 			ResultSet rs = psta.executeQuery();
 			if(rs.next()){
-				assunto = new Assunto();
-				assunto.setCodAssunto(rs.getInt("codAssunto"));
-				assunto.setDescricao(rs.getString("descricao"));
-				assunto.setDescricaoArea(rs.getString("descricaoArea"));
+				imagem = new Imagem();
+				imagem.setCodImagem(rs.getInt("codImagem"));
+				imagem.setTituloImagem(rs.getString("tituloImagem"));
+				imagem.setBitmapImagem(rs.getBytes("bitmapImagem"));
 			}
 		} catch (SQLException e) {
 			throw e;
@@ -44,6 +35,7 @@ public class AssuntoService {
 			if (conn != null)
 				conn.close ();
 		}
-		return assunto;
+		
+		return imagem;
 	}
 }
