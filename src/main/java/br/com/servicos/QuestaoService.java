@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+<<<<<<< HEAD
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,16 +18,24 @@ import javax.ws.rs.core.Response;
 import br.com.controller.GameState;
 import br.com.controller.GameStateManage;
 import br.com.objetos.Evento;
+=======
+import javax.ws.rs.Path;
+
+>>>>>>> origin/master
 import br.com.objetos.Questao;
 import br.com.senac.pi4.services.Database;
 
 @Path("/questao")
 public class QuestaoService {
 	
+<<<<<<< HEAD
 	@Context ServletContext contexto;
 	private GameStateManage gsm = GameStateManage.getGameStateManage(contexto);
 	
 	public Questao selecionaQuestoes(String identificador) throws Exception{
+=======
+	public Questao selecionaQuestoes(String codEvento) throws Exception{
+>>>>>>> origin/master
 		
 		Connection conn = null;
 		PreparedStatement psta = null;
@@ -34,6 +43,7 @@ public class QuestaoService {
 		
 		try{
 			conn = Database.get().conn();		
+<<<<<<< HEAD
 			psta = conn.prepareStatement("select top 1 Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ? and QuestaoEvento.codStatus = 'A'");
 			psta.setString(1, identificador);
 			
@@ -50,6 +60,17 @@ public class QuestaoService {
 				questao.setDificuldade(rs.getString("dificuldade"));
 				questao.setLstAlternativa(AlternativaService.selecionaAlternativas(questao.getCodQuestao()));
 			}
+=======
+			psta = conn.prepareStatement("select top 1 Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao where QuestaoEvento.codEvento = ? and QuestaoEvento.codStatus = 'A'");
+			Integer eID = null;
+			eID = Integer.parseInt(codEvento);
+			psta.setInt(1, eID);
+			
+			ResultSet rs = psta.executeQuery();
+			rs.next();
+			questao.setCodQuestao(rs.getInt("codQuestao"));
+			
+>>>>>>> origin/master
 		}catch (SQLException e) {
 			throw e;
 		} catch (Exception e) {
@@ -60,6 +81,7 @@ public class QuestaoService {
 			if (conn != null)
 				conn.close ();
 		}
+<<<<<<< HEAD
 
 		return new Questao();
 	}
@@ -82,6 +104,11 @@ public class QuestaoService {
 			if (conn != null)
 				conn.close ();
 		}
+=======
+		
+		
+		return new Questao();
+>>>>>>> origin/master
 	}
 	
 	@GET

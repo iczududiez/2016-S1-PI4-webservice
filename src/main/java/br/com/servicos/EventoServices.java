@@ -84,6 +84,10 @@ public class EventoServices {
 		return codEvento;
 	}
 	
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 	@GET
 	@Path("/{idEvento}")
 	@Produces(MediaType.APPLICATION_JSON)

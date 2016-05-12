@@ -42,6 +42,8 @@ public class GameStateManage {
 			setGameState(idEvento,gs);
 		}
 		
+		lifeCicleGameState();
+		
 		return gs;
 	}
 	
