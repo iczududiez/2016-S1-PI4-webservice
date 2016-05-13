@@ -6,21 +6,40 @@ import br.com.objetos.Questao;
 
 public class GameState {
 	
-	public GameState(String idEvento,Timestamp timeState){
+	public GameState(String identificador,int idEvento,Timestamp timeState){
+		this.identificador = identificador;
 		this.idEvento = idEvento;
 		this.timeState = timeState;
 	}
 
 	private Timestamp timeState;
-	private String idEvento;
+	private String identificador;
+	private int idEvento;
 	private Questao questaoAtual;
+	private String statusEvento; 
 	
-	public String getIdEvento() {
+	public String getStatusEvento() {
+		return statusEvento;
+	}
+
+	public void setStatusEvento(String statusEvento) {
+		this.statusEvento = statusEvento;
+	}
+
+	public int getIdEvento() {
 		return idEvento;
 	}
 
-	public void setIdEvento(String idEvento) {
+	public void setIdEvento(int idEvento) {
 		this.idEvento = idEvento;
+	}
+
+	public String getIdentificador() {
+		return identificador;
+	}
+
+	public void setIdentificador(String identificador) {
+		this.identificador = identificador;
 	}
 
 	public Timestamp getTimeState() {
@@ -31,11 +50,11 @@ public class GameState {
 		this.timeState = timeState;
 	}
 	
-	public Questao getQuestao(){
+	public Questao getQuestaoAtual(){
 		return this.questaoAtual;
 	}
 	
-	public void setQuestao(Questao questao){
+	public void setQuestaoAtual(Questao questao){
 		this.questaoAtual = questao;
 	}
 }

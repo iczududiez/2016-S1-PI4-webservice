@@ -15,7 +15,7 @@ public class ImagemService {
 		Imagem imagem = null;
 		try {
 			conn = Database.get().conn();		
-			psta = conn.prepareStatement("select Assunto.codAssunto, Assunto.descricao, Area.descricao as descricaoArea from  Assunto inner join Area on Assunto.codArea = Area.codArea where codAssunto = ?");
+			psta = conn.prepareStatement("select * from Imagem where codImagem = ?");
 			psta.setInt(1, codImagem);
 			
 			ResultSet rs = psta.executeQuery();

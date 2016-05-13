@@ -21,9 +21,6 @@ import br.com.senac.pi4.services.Database;
 //@Path("/alternativa")
 public class AlternativaService {
 	
-	@Context ServletContext contexto;
-	private GameStateManage gsm = GameStateManage.getGameStateManage(contexto);
-	
 	public static List<Alternativa> selecionaAlternativas(int codQuestao) throws Exception{
 		
 		List<Alternativa> lstAlternativa = new ArrayList<Alternativa>();

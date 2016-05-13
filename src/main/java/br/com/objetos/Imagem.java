@@ -1,6 +1,7 @@
 package br.com.objetos;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class Imagem {
 	
@@ -24,7 +25,8 @@ public class Imagem {
 		return bitmapImagem;
 	}
 	public void setBitmapImagem(byte[] bitmapImagem) {
-		this.bitmapImagem = new String(bitmapImagem, StandardCharsets.UTF_8);;
+		
+		this.bitmapImagem = Base64.getEncoder().encodeToString(bitmapImagem);
 	}
 	
 }

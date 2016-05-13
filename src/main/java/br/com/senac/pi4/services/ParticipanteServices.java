@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,36 +13,30 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import br.com.objetos.Participante;
-import br.com.senac.pi4.services.Database;
-import br.com.senac.pi4.services.ParticipanteGrupo;
 
 
 @Path("/participante")
 public class ParticipanteServices {
 	
-	public Participante selectParticipante(String login,byte[] senha) throws Exception{
+	public Participante selectParticipante(String login,String senha) throws Exception{
 		
 		Connection conn = null;
 		PreparedStatement psta = null;
 		Participante participante = null;
 		try {
-			conn = Database.get().conn();		
-			psta = conn.prepareStatement("select * from Participante where email = ? and senha = ? and ativo = 1");
+			conn = Database.get().conn();	
+			//String sql = "select * from Participante where email = '"+login + "' and senha = HASHBYTES('SHA1', '"+senha+"') and ativo = 1";
+			psta = conn.prepareStatement("select * from Participante where email = ? and senha = HASHBYTES('SHA1', convert(varchar, ?)) and ativo = 1");
 			psta.setString(1, login);
-			psta.setBytes(2, senha);
-
-			System.out.print(login);
-			System.out.print(senha);
+			psta.setString(2, senha);
 			
 			ResultSet rs = psta.executeQuery();
-			
-			participante = new Participante();
-			participante.setCodParticipante(rs.getInt("codParticipante"));
-			participante.setNmParticipante(rs.getString("nmParticipante"));
-			participante.setCodParticipante(rs.getInt("codCurso"));
-			participante.setEmail(rs.getString("email"));
-			participante.setSenha(rs.getString("senha"));
-			participante.setAtivo(rs.getBoolean("ativo"));
+			if(rs.next()){
+				participante = new Participante();
+				participante.setCodParticipante(rs.getInt("codParticipante"));
+				participante.setNmParticipante(rs.getString("nmParticipante"));
+				participante.setCodParticipante(rs.getInt("codCurso"));
+			}
 		} catch (SQLException e) {
 			throw e;
 		} catch (Exception e) {
@@ -60,13 +53,14 @@ public class ParticipanteServices {
 	@GET
 	@Path("/{login}/{senha}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getParticipante(@PathParam("login") String login, @PathParam("senha") byte[] senha) {
+	public Response getParticipante(@PathParam("login") String login, @PathParam("senha") String senha) {
 
 		Participante participante = null;
 		
 		try {
 			participante = selectParticipante(login, senha);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Response.status(500).entity(null).build();	
 		}
 		if (participante == null){
@@ -76,16 +70,4 @@ public class ParticipanteServices {
 		
 		return Response.status(200).entity(participante).build();
 	}
-	
-
-	@GET
-	@Path("/teste/{teste}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getParticipante(@PathParam("teste") String login) {
-
-		
-		return Response.status(200).entity(login).build();
-	}
-	
-	
 }

@@ -16,15 +16,14 @@ import javax.ws.rs.core.Response;
 
 import br.com.controller.GameState;
 import br.com.controller.GameStateManage;
-import br.com.objetos.Evento;
 import br.com.objetos.Questao;
-import br.com.senac.pi4.services.Database;
 
 @Path("/questao")
 public class QuestaoService {
 	
 	@Context ServletContext contexto;
-	private GameStateManage gsm = GameStateManage.getGameStateManage(contexto);
+	private GameStateManage gsm;
+	private GameState gs;
 	
 	public Questao selecionaQuestoes(String identificador) throws Exception{
 		
@@ -33,15 +32,16 @@ public class QuestaoService {
 		Questao questao = null;
 		
 		try{
-			conn = Database.get().conn();		
-			psta = conn.prepareStatement("select top 1 Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ? and QuestaoEvento.codStatus = 'A'");
+			conn = Database.get().conn();
+			psta = conn.prepareStatement("select top 1 Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ?");
 			psta.setString(1, identificador);
 			
 			ResultSet rs = psta.executeQuery();
 			if(rs.next()){
 				questao = new Questao();
+				questao.setCodEvento(rs.getInt("codEvento"));
 				questao.setCodQuestao(rs.getInt("codQuestao"));
-				questao.setTextoQuestao(rs.getString("textQestao"));
+				questao.setTextoQuestao(rs.getString("textoQuestao"));
 				questao.setAssunto(AssuntoService.selecionaAssunto(rs.getInt("codAssunto")));
 				questao.setImagem(ImagemService.selecionaImagem(rs.getInt("codImagem")));
 				questao.setCodTipoQuestao(rs.getString("codTipoQuestao"));
@@ -61,17 +61,22 @@ public class QuestaoService {
 				conn.close ();
 		}
 
-		return new Questao();
+		return questao;
 	}
 	
-	public void atualizaQuestao(String Status) throws Exception{
+	public static int atualizaQuestao(String status,int codEvento,int codQuestao) throws Exception{
 		
 		Connection conn = null;
 		PreparedStatement psta = null;
+		int result = 0;
 		try{
 			conn = Database.get().conn();
-			psta = conn.prepareStatement("");
-			psta.executeUpdate();
+			psta = conn.prepareStatement("update QuestaoEvento set codStatus = ? where codEvento = ? and codQuestao = ?");
+			psta.setString(1, status);
+			psta.setInt(2, codEvento);
+			psta.setInt(3, codQuestao);
+			
+			result = psta.executeUpdate();
 		}catch (SQLException e) {
 			throw e;
 		} catch (Exception e) {
@@ -82,26 +87,33 @@ public class QuestaoService {
 			if (conn != null)
 				conn.close ();
 		}
+		
+		return result;
 	}
 	
 	@GET
 	@Path("/{identificador}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getEvento(@PathParam("codEvento") String identificador) {
+	public Response getEvento(@PathParam("identificador") String identificador) {
 
 		Questao questao = null;
 		
 		try {
 			questao = selecionaQuestoes(identificador);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Response.status(500).entity(null).build();	
 		}
 		if (questao == null){
 			return Response.status(404).entity(null).build();
 		}
 		
-		GameState gs = gsm.getGameState(identificador);
-		gs.setQuestao(questao);
+		gsm = GameStateManage.getGameStateManage(contexto);
+		gs = gsm.getGameState(identificador,questao.getCodEvento());
+		gs.setQuestaoAtual(questao);
+		
+		if(atualizaQuestao("E",questao.getCodEvento(),questao.getCodQuestao()) > 0);
+		
 		
 		return Response.status(200).entity(questao).build();
 	}

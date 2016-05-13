@@ -33,13 +33,13 @@ public class GameStateManage {
 		return gsm;
 	}
 	
-	public GameState getGameState(String idEvento){
+	public GameState getGameState(String identificador,Integer idEvento){
 		
-		GameState gs = gameStates.get(idEvento);
+		GameState gs = gameStates.get(identificador);
 		
 		if(gs == null){
-			gs = new GameState(idEvento,new Timestamp(new Date().getTime()));
-			setGameState(idEvento,gs);
+			gs = new GameState(identificador,idEvento,new Timestamp(new Date().getTime()));
+			setGameState(identificador,gs);
 		}
 		
 		lifeCicleGameState();

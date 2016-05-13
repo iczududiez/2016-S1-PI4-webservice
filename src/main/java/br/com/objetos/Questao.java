@@ -5,6 +5,7 @@ import java.util.List;
 public class Questao {
 	
 	private int codQuestao;
+	private int codEvento;
 	private String textoQuestao;
 	private Assunto assunto;
 	private Imagem imagem;
@@ -19,7 +20,13 @@ public class Questao {
 	//D = Dificil
 	private String dificuldade;
 	private List<Alternativa> lstAlternativa;
-	
+
+	public int getCodEvento() {
+		return codEvento;
+	}
+	public void setCodEvento(int codEvento) {
+		this.codEvento = codEvento;
+	}
 	public int getCodQuestao() {
 		return codQuestao;
 	}

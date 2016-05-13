@@ -14,15 +14,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import br.com.controller.GameState;
 import br.com.controller.GameStateManage;
 import br.com.objetos.Evento;
-import br.com.senac.pi4.services.Database;
 
 @Path("/evento")
 public class EventoServices {
 	
 	@Context ServletContext contexto;
-	private GameStateManage gsm = GameStateManage.getGameStateManage(contexto);
+	private GameStateManage gsm;
 	
 	public Evento selectEvento(String idEvento) throws Exception{
 		
@@ -68,8 +68,9 @@ public class EventoServices {
 			psta.setString(1, identificador);
 			
 			ResultSet rs = psta.executeQuery();
-			rs.next();
-			codEvento = rs.getString("codStatus");
+			if(rs.next()){
+				codEvento = rs.getString("codStatus");
+			}
 		} catch (SQLException e) {
 			throw e;
 		} catch (Exception e) {
@@ -101,8 +102,9 @@ public class EventoServices {
 		}else if(evento.getCodStatus() == "F"){
 			return Response.status(401).entity(null).build();
 		}
-		
-		gsm.getGameState(idEvento);
+		gsm = GameStateManage.getGameStateManage(contexto);
+		GameState gs = gsm.getGameState(idEvento,evento.getCodEvento());
+		gs.setStatusEvento(evento.getCodStatus());
 		
 		return Response.status(200).entity(evento).build();
 	}
