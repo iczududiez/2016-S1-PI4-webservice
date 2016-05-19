@@ -1,6 +1,8 @@
 package br.com.controller;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.objetos.Questao;
 
@@ -10,14 +12,32 @@ public class GameState {
 		this.identificador = identificador;
 		this.idEvento = idEvento;
 		this.timeState = timeState;
+		this.listaOrdemJogadores = new ArrayList<Integer>();
 	}
 
 	private Timestamp timeState;
 	private String identificador;
 	private int idEvento;
 	private Questao questaoAtual;
-	private String statusEvento; 
+	private String statusEvento;
+	private List<Integer> listaOrdemJogadores; 
 	
+	public List<Integer> getListaOrdemJogadores() {
+		return listaOrdemJogadores;
+	}
+
+	public void setListaOrdemJogadores(int jogador) {
+		if(!this.listaOrdemJogadores.contains(jogador)){
+			this.listaOrdemJogadores.add(jogador);
+		}
+	}
+	
+	public void removeJogador(int index){
+		if(this.listaOrdemJogadores.size() > 0){
+			this.listaOrdemJogadores.remove(index);
+		}
+	}
+
 	public String getStatusEvento() {
 		return statusEvento;
 	}

@@ -47,6 +47,13 @@ public class GameStateManage {
 		return gs;
 	}
 	
+	public GameState getGameState(String identificador){
+		
+		GameState gs = gameStates.get(identificador);
+		lifeCicleGameState();
+		return gs;
+	}
+	
 	private void setGameState(String idEvento, GameState gs){
 		gameStates.put(idEvento,gs);
 	}

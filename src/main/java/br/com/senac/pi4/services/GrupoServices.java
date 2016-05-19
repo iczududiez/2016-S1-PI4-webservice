@@ -85,9 +85,5 @@ public class GrupoServices {
 		String jsonUser = gson.toJson(user);
 		System.out.println("salvando usuario "+jsonUser);
 		return Response.status(200).entity("").build();
- 
 	}
-	
-	
- 
 }

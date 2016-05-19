@@ -97,9 +97,27 @@ public class QuestaoService {
 	public Response getEvento(@PathParam("identificador") String identificador) {
 
 		Questao questao = null;
+		gsm = GameStateManage.getGameStateManage(contexto);
+		
 		
 		try {
-			questao = selecionaQuestoes(identificador);
+			gs = gsm.getGameState(identificador);
+			if(gs == null){
+				questao = selecionaQuestoes(identificador);
+				if(questao != null){
+					gs = gsm.getGameState(identificador,questao.getCodEvento());
+					gs.setQuestaoAtual(questao);
+				}
+			}else{
+				questao = gs.getQuestaoAtual();
+				if(questao == null){
+					questao = selecionaQuestoes(identificador);
+					if(questao != null){
+						gs = gsm.getGameState(identificador,questao.getCodEvento());
+						gs.setQuestaoAtual(questao);
+					}
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).entity(null).build();	
@@ -110,9 +128,13 @@ public class QuestaoService {
 		
 		gsm = GameStateManage.getGameStateManage(contexto);
 		gs = gsm.getGameState(identificador,questao.getCodEvento());
-		gs.setQuestaoAtual(questao);
 		
-		if(atualizaQuestao("E",questao.getCodEvento(),questao.getCodQuestao()) > 0);
+		try {
+			if(atualizaQuestao("E",questao.getCodEvento(),questao.getCodQuestao()) > 0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		return Response.status(200).entity(questao).build();
