@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -33,7 +35,8 @@ public class QuestaoService {
 		
 		try{
 			conn = Database.get().conn();
-			psta = conn.prepareStatement("select top 1 Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ?");
+			psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ?	");
+			//psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ? and QuestaoEvento.codStatus = 'A'");
 			psta.setString(1, identificador);
 			
 			ResultSet rs = psta.executeQuery();
@@ -98,25 +101,22 @@ public class QuestaoService {
 
 		Questao questao = null;
 		gsm = GameStateManage.getGameStateManage(contexto);
-		
+		boolean atualiza = false;
 		
 		try {
 			gs = gsm.getGameState(identificador);
-			if(gs == null){
-				questao = selecionaQuestoes(identificador);
-				if(questao != null){
-					gs = gsm.getGameState(identificador,questao.getCodEvento());
-					gs.setQuestaoAtual(questao);
-				}
-			}else{
+			if(gs != null){
 				questao = gs.getQuestaoAtual();
-				if(questao == null){
-					questao = selecionaQuestoes(identificador);
-					if(questao != null){
-						gs = gsm.getGameState(identificador,questao.getCodEvento());
-						gs.setQuestaoAtual(questao);
-					}
-				}
+			}else{
+				questao = selecionaQuestoes(identificador);
+			}
+			
+			if(questao != null){
+				gs = gsm.getGameState(identificador,questao.getCodEvento());
+				gs.setQuestaoAtual(questao);
+				gs.setEstadoDoJogo("P");
+				gs.setInicioEusei(new Timestamp(new Date().getTime()));
+				atualiza = true;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -130,7 +130,9 @@ public class QuestaoService {
 		gs = gsm.getGameState(identificador,questao.getCodEvento());
 		
 		try {
-			if(atualizaQuestao("E",questao.getCodEvento(),questao.getCodQuestao()) > 0);
+			if(atualiza){
+				if(atualizaQuestao("E",questao.getCodEvento(),questao.getCodQuestao()) > 0);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
