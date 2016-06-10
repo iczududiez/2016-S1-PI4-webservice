@@ -58,13 +58,13 @@ public class EventoServices {
 		return evento;
 	}
 	
-	public String statusEvento(String identificador) throws Exception{
+	public static String statusEvento(String identificador) throws Exception{
 		Connection conn = null;
 		PreparedStatement psta = null;
 		String codEvento = null;
 		try {
 			conn = Database.get().conn();		
-			psta = conn.prepareStatement("select codStatus from Evento where identificador = ?");
+			psta = conn.prepareStatement("select codStatus from Evento where identificador = ?");// and codStatus = 'A'
 			psta.setString(1, identificador);
 			
 			ResultSet rs = psta.executeQuery();
@@ -104,6 +104,7 @@ public class EventoServices {
 		}
 		gsm = GameStateManage.getGameStateManage(contexto);
 		GameState gs = gsm.getGameState(idEvento,evento.getCodEvento());
+		gs.setEvento(evento);
 		gs.setStatusEvento(evento.getCodStatus());
 		
 		return Response.status(200).entity(evento).build();

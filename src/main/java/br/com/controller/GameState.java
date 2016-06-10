@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import br.com.objetos.Evento;
 import br.com.objetos.Questao;
 
 public class GameState {
@@ -24,6 +25,19 @@ public class GameState {
 	private Questao questaoAtual;
 	private String statusEvento;
 	private List<Integer> listaOrdemJogadores;
+	private Evento evento;
+	private int tempoDeResposta;
+	private Timestamp inicioResposta;
+	private Timestamp inicioEusei;
+	private String estadoDoJogo;
+	public Evento getEvento() {
+		return evento;
+	}
+
+	public void setEvento(Evento evento) {
+		this.evento = evento;
+	}
+
 	public Timestamp getInicioEusei() {
 		return inicioEusei;
 	}
@@ -39,11 +53,6 @@ public class GameState {
 	public void setEstadoDoJogo(String estadoDoJogo) {
 		this.estadoDoJogo = estadoDoJogo;
 	}
-
-	private int tempoDeResposta;
-	private Timestamp inicioResposta;
-	private Timestamp inicioEusei;
-	private String estadoDoJogo;
 	
 	public int getTempoDeResposta() {
 		return tempoDeResposta;

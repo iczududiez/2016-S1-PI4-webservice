@@ -35,8 +35,8 @@ public class QuestaoService {
 		
 		try{
 			conn = Database.get().conn();
-			psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ?	");
-			//psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ? and QuestaoEvento.codStatus = 'A'");
+			//psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ?	");
+			psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ? and QuestaoEvento.codStatus = 'A' and Questao.ativo = 1");
 			psta.setString(1, identificador);
 			
 			ResultSet rs = psta.executeQuery();
@@ -65,6 +65,34 @@ public class QuestaoService {
 		}
 
 		return questao;
+	}
+	
+	public static boolean temQuestao(String identificador) throws Exception{
+		Connection conn = null;
+		PreparedStatement psta = null;
+		Questao questao = null;
+		boolean ret = false;
+		try{
+			conn = Database.get().conn();
+			//psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ?	");
+			psta = conn.prepareStatement("select top 1 QuestaoEvento.codEvento, Questao.codQuestao, Questao.textoQuestao, Questao.codAssunto, Questao.codImagem, Questao.codTipoQuestao, Questao.codProfessor, Questao.ativo, Questao.dificuldade from QuestaoEvento inner join Questao on QuestaoEvento.codQuestao = Questao.codQuestao inner join Evento on QuestaoEvento.codEvento = Evento.codEvento where Evento.identificador = ? and QuestaoEvento.codStatus = 'A' and Questao.ativo = 1");
+			psta.setString(1, identificador);
+			
+			ResultSet rs = psta.executeQuery();
+			ret = rs.next();
+		}catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (psta != null)
+				psta.close();
+			if (conn != null)
+				conn.close ();
+		}
+
+		return ret;
+		
 	}
 	
 	public static int atualizaQuestao(String status,int codEvento,int codQuestao) throws Exception{
@@ -96,7 +124,7 @@ public class QuestaoService {
 	
 	@GET
 	@Path("/{identificador}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response getEvento(@PathParam("identificador") String identificador) {
 
 		Questao questao = null;
@@ -107,10 +135,11 @@ public class QuestaoService {
 			gs = gsm.getGameState(identificador);
 			if(gs != null){
 				questao = gs.getQuestaoAtual();
-			}else{
+			}
+			if(questao == null){
 				questao = selecionaQuestoes(identificador);
 			}
-			
+
 			if(questao != null){
 				gs = gsm.getGameState(identificador,questao.getCodEvento());
 				gs.setQuestaoAtual(questao);

@@ -1,5 +1,9 @@
 package br.com.senac.pi4.services;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +33,9 @@ import br.com.objetos.Questao;
  * E
  */
 
+//url WebService
+//tsitomcat.azurewebsites.net/eusei/rest/
+
 @Path("/jogo")
 public class GameService{
  
@@ -41,6 +48,33 @@ public class GameService{
 		return true;
 	}
 	
+	public static int selecionaCodGrupo(int idJogador,int codEvento) throws Exception{
+		
+		Connection conn = null;
+		PreparedStatement psta = null;
+		int result = 0;
+		try{
+			conn = Database.get().conn();
+			psta = conn.prepareStatement("select ParticipanteGrupo.codGrupo from ParticipanteGrupo inner join Grupo on ParticipanteGrupo.codGrupo = Grupo.codGrupo where ParticipanteGrupo.codParticipante = ? and Grupo.codEvento = ?");
+			psta.setInt(1,idJogador);
+			psta.setInt(2,codEvento);
+			
+			ResultSet rs = psta.executeQuery();
+			result = rs.getInt("codGrupo");
+			
+		}catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (psta != null)
+				psta.close();
+			if (conn != null)
+				conn.close ();
+		}
+		
+		return result;
+	}
 	
 	@GET
 	@Path("/ordemJogador/{identificador}/{idJogador}")
@@ -50,7 +84,7 @@ public class GameService{
 		try{
 			gsm = GameStateManage.getGameStateManage(contexto);
 			gs = gsm.getGameState(identificador);
-			if(gs != null && gs.getEstadoDoJogo() == "P"){
+			if(gs != null && gs.getEstadoDoJogo().equals("P")){
 				if(gs.getListaOrdemJogadores().size() < 4 || !gs.expirouTempoEuSei()){
 					if(gs.getQuestaoAtual() != null){
 						gs.setListaOrdemJogadores(Integer.parseInt(idJogador));
@@ -82,7 +116,7 @@ public class GameService{
 		try{
 			gsm = GameStateManage.getGameStateManage(contexto);
 			gs = gsm.getGameState(identificador);
-			if(gs != null && gs.getEstadoDoJogo() == "R"){
+			if(gs != null && gs.getEstadoDoJogo().equals("R")){
 				List<Integer> jogadores = gs.getListaOrdemJogadores();
 				count = jogadores.size();
 				if(count > 0){
@@ -118,14 +152,25 @@ public class GameService{
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getEstadoJogo(@PathParam("identificador") String identificador){
 		
+		String ret = "";
+		String codStatusEvento = "";
 		try{
 			gsm = GameStateManage.getGameStateManage(contexto);
 			gs = gsm.getGameState(identificador);
+			ret = gs.getEstadoDoJogo();
+			if(ret.equals("AP")){
+				ret = QuestaoService.temQuestao(identificador) ? "P" : ret;
+			}
+			codStatusEvento = EventoServices.statusEvento(identificador);
+			if(codStatusEvento.equals("F")){
+				ret = codStatusEvento;
+			}
+			
 		} catch (Exception e) {
 			return Response.status(500).entity(null).build();
 		}
 		
-		return Response.status(200).entity(gs.getEstadoDoJogo()).build();
+		return Response.status(200).entity(ret).build();
 	}
 	
 	@GET
@@ -133,19 +178,42 @@ public class GameService{
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response reposta(@PathParam("identificador") String identificador, @PathParam("idJogador") String idJogador, @PathParam("codAlternativa") String codAlternativa, @PathParam("valor") String valor){
 		
+		Integer codGrupo,codParticipante,alternativa;
+		
 		try{
 			gsm = GameStateManage.getGameStateManage(contexto);
 			gs = gsm.getGameState(identificador);
-			if(gs != null && gs.getEstadoDoJogo() == "R"){
-				List<Integer> jogadores = gs.getListaOrdemJogadores();
-				int count = jogadores.size();
-				if(count > 0){
-					jogadores.remove(0);
-					gs.setInicioResposta(null);
-				}
-				if(count == 0){
+			if(gs != null && gs.getEstadoDoJogo().equals("R")){
+				if(valor == "1"){
+					QuestaoService.atualizaQuestao("F", gs.getQuestaoAtual().getCodEvento(), gs.getQuestaoAtual().getCodQuestao());
 					gs.setEstadoDoJogo("AP");
+					gs.setQuestaoAtual(null);
+				}else{
+					List<Integer> jogadores = gs.getListaOrdemJogadores();
+					int count = jogadores.size();
+					if(count > 0){
+						jogadores.remove(0);
+						gs.setInicioResposta(null);
+					}
+					if(count == 0){
+						gs.setEstadoDoJogo("AP");
+						gs.setQuestaoAtual(null);
+					}
 				}
+				
+				Connection conn = null;
+				PreparedStatement psta = null;
+				
+				codParticipante = Integer.parseInt(idJogador);
+				alternativa = Integer.parseInt(codAlternativa);
+				codGrupo = selecionaCodGrupo(codParticipante,gs.getQuestaoAtual().getCodEvento()); 
+				
+				conn = Database.get().conn();
+				psta = conn.prepareStatement("insert into QuestaoGrupo(codQuestao, codAlternativa,codGrupo,correta) values (?,?,?,?)");
+				psta.setInt(1, gs.getQuestaoAtual().getCodQuestao());
+				psta.setInt(1, alternativa);
+				psta.setInt(1, codGrupo);
+				psta.setBoolean(1, valor.equals("1"));
 			}
 		} catch (Exception e) {
 			return Response.status(500).entity(null).build();
@@ -162,7 +230,7 @@ public class GameService{
 		try{
 			gsm = GameStateManage.getGameStateManage(contexto);
 			gs = gsm.getGameState(identificador);
-			if(gs != null && gs.getEstadoDoJogo() == "R"){
+			if(gs != null && gs.getEstadoDoJogo().equals("R")){
 				List<Integer> jogadores = gs.getListaOrdemJogadores();
 				int count = jogadores.size();
 				if(count > 0){

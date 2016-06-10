@@ -35,7 +35,8 @@ public class ParticipanteServices {
 				participante = new Participante();
 				participante.setCodParticipante(rs.getInt("codParticipante"));
 				participante.setNmParticipante(rs.getString("nmParticipante"));
-				participante.setCodParticipante(rs.getInt("codCurso"));
+				participante.setCodCurso(rs.getInt("codCurso"));
+				participante.setEmail(rs.getString("email"));
 			}
 		} catch (SQLException e) {
 			throw e;
