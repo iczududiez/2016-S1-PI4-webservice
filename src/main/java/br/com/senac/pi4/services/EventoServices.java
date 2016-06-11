@@ -31,7 +31,7 @@ public class EventoServices {
 		Evento evento = null;
 		try {
 			conn = Database.get().conn();		
-			psta = conn.prepareStatement("select * from Evento where identificador = ?");
+			psta = conn.prepareStatement("select * from Evento where identificador = ? and codTipoEvento = 2");
 			psta.setString(1, idEvento);
 			
 			ResultSet rs = psta.executeQuery();

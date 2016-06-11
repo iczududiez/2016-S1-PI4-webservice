@@ -15,7 +15,7 @@ public class GameState {
 		this.idEvento = idEvento;
 		this.timeState = timeState;
 		this.listaOrdemJogadores = new ArrayList<Integer>();
-		this.tempoDeResposta = 30000;
+		this.tempoDeResposta = 60000;
 		this.estadoDoJogo = "AP";
 	}
 
@@ -127,7 +127,7 @@ public class GameState {
 	}
 	
 	public boolean expirouTempoEuSei(){
-		return this.getInicioEusei() != null && (new Date().getTime() - this.getInicioResposta().getTime()) > this.getTempoDeResposta();
+		return this.getInicioEusei() != null && (new Date().getTime() - this.getInicioEusei().getTime()) > this.getTempoDeResposta();
 	}
 	
 	public boolean expirouTempoResposta(){
