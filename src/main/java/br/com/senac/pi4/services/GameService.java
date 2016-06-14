@@ -133,13 +133,15 @@ public class GameService{
 				if(count > 0){
 					ret = (gs.getListaOrdemJogadores().get(0) == Integer.parseInt(idJogador));
 					if(ret){
-						if(gs.getInicioResposta() == null || gs.expirouTempoResposta()){
-							gs.setInicioResposta(new Timestamp(new Date().getTime()));
-						}
-						if(gs.expirouTempoResposta()){
-							gs.removeJogador(0);
+						if(gs.getInicioResposta() == null){
+							gs.setInicioResposta(new Timestamp(new Date().getTime()));	
 						}
 					}
+					if(gs.expirouTempoResposta()){
+						gs.setInicioResposta(null);
+						gs.removeJogador(0);
+					}
+					
 				}else{
 					gs.setEstadoDoJogo("AP");
 				}
@@ -149,10 +151,6 @@ public class GameService{
 		}
 		if(gs == null){
 			return Response.status(404).entity(null).build();
-		}else if(count == 0){
-			return Response.status(400).entity(null).build();
-		}else if(!ret){
-			return Response.status(100).entity(null).build();
 		}
 		
 		return Response.status(200).entity(ret).build();
